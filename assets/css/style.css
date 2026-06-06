@@ -1414,7 +1414,11 @@ h1,h2,h3,h4,h5,h6 {
   .cookie-actions .btn { flex: 1; justify-content: center; font-size: 0.82rem; padding: 10px 8px; }
 }
 
-/* Animations */
+/* ================================================
+   ANIMÁCIÓK — Teljes rendszer
+   ================================================ */
+
+/* --- Alap keyframe-ek --- */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(30px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -1423,10 +1427,80 @@ h1,h2,h3,h4,h5,h6 {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
+@keyframes pulse {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.5; transform: scale(1.4); }
+}
+
+/* --- Hero badge pulse (már van fent, de biztonság kedvéért) --- */
+.hero-badge-dot { animation: pulse 2s infinite; }
+
+/* --- Laser canvas --- */
+#laser-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* --- Typewriter cursor --- */
+#typewriter-text::after {
+  content: '|';
+  color: var(--orange);
+  animation: blink 0.8s step-end infinite;
+  margin-left: 2px;
+}
+@keyframes blink {
+  0%,100% { opacity: 1; }
+  50%      { opacity: 0; }
+}
+
+/* --- Glitch effect --- */
+.glitch {
+  position: relative;
+  display: inline-block;
+}
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  overflow: hidden;
+  opacity: 0;
+}
+.glitch:hover::before {
+  opacity: 0.7;
+  color: var(--orange);
+  clip-path: polygon(0 20%, 100% 20%, 100% 40%, 0 40%);
+  transform: translateX(-3px);
+  animation: glitch-1 0.3s steps(2) forwards;
+}
+.glitch:hover::after {
+  opacity: 0.7;
+  color: #4af;
+  clip-path: polygon(0 60%, 100% 60%, 100% 80%, 0 80%);
+  transform: translateX(3px);
+  animation: glitch-2 0.3s steps(2) forwards;
+}
+@keyframes glitch-1 {
+  0%   { clip-path: polygon(0 10%, 100% 10%, 100% 30%, 0 30%); transform: translateX(-4px); }
+  50%  { clip-path: polygon(0 50%, 100% 50%, 100% 70%, 0 70%); transform: translateX(4px); }
+  100% { clip-path: polygon(0 0,   100% 0,   100% 0,   0 0);   transform: translateX(0); opacity: 0; }
+}
+@keyframes glitch-2 {
+  0%   { clip-path: polygon(0 60%, 100% 60%, 100% 80%, 0 80%); transform: translateX(4px); }
+  50%  { clip-path: polygon(0 20%, 100% 20%, 100% 40%, 0 40%); transform: translateX(-4px); }
+  100% { clip-path: polygon(0 0,   100% 0,   100% 0,   0 0);   transform: translateX(0); opacity: 0; }
+}
+
+/* --- Animate utility osztályok --- */
 .animate-fade-up { animation: fadeUp 0.7s ease forwards; }
 .animate-fade-in { animation: fadeIn 0.6s ease forwards; }
 
-/* Orange glow accent line */
+/* --- Orange glow accent line --- */
 .accent-line {
   display: block;
   width: 100%;
@@ -1436,10 +1510,156 @@ h1,h2,h3,h4,h5,h6 {
   opacity: 0.4;
 }
 
-/* Highlight box */
+/* --- Highlight box --- */
 .highlight-box {
   background: linear-gradient(135deg, rgba(249,115,22,0.08), rgba(249,115,22,0.03));
   border: 1px solid rgba(249,115,22,0.2);
   border-radius: var(--radius-lg);
   padding: 32px;
 }
+
+/* --- Shimmer loading skeleton (képekre) --- */
+.img-rounded {
+  animation: none;
+}
+.img-rounded[data-loaded="false"] {
+  background: linear-gradient(90deg, var(--dark-gray) 25%, var(--mid-gray) 50%, var(--dark-gray) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+/* --- Hover border sweep (kártyákon) --- */
+.card::after,
+.service-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid var(--orange);
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+.card { position: relative; overflow: hidden; }
+.card:hover::after,
+.service-card:hover::after {
+  opacity: 0.5;
+  transform: scale(1);
+}
+
+/* --- Floating glow orb a hero mögött --- */
+.hero-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 1;
+  animation: orbFloat 8s ease-in-out infinite;
+}
+.hero-orb-1 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(249,115,22,0.12) 0%, transparent 70%);
+  top: -100px; right: -80px;
+  animation-delay: 0s;
+}
+.hero-orb-2 {
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(249,115,22,0.07) 0%, transparent 70%);
+  bottom: 60px; left: 10%;
+  animation-delay: -4s;
+}
+@keyframes orbFloat {
+  0%,100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-30px) scale(1.05); }
+}
+
+/* --- Section label animált vonal --- */
+.section-label::before {
+  transition: width 0.6s ease;
+}
+
+/* --- Nav link underline sweep --- */
+.nav-links a {
+  position: relative;
+}
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: 4px; left: 14px; right: 14px;
+  height: 1px;
+  background: var(--orange);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s ease;
+}
+.nav-links a:hover::after,
+.nav-links a.active::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* --- Page hero szöveg animáció --- */
+.page-hero-content {
+  animation: fadeUp 0.7s ease 0.1s both;
+}
+
+/* --- CTA banner belső mozgás --- */
+.cta-banner {
+  animation: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.cta-banner:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 60px rgba(249,115,22,0.3);
+}
+
+/* --- Gallery item scale --- */
+.gallery-item {
+  transition: transform 0.4s cubic-bezier(.16,1,.3,1), box-shadow 0.4s ease;
+}
+.gallery-item:hover {
+  transform: scale(1.03);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6), 0 0 20px rgba(249,115,22,0.15);
+  z-index: 2;
+}
+
+/* --- Feature strip item hover --- */
+.feature-strip-item {
+  transition: background 0.25s ease;
+  border-radius: 6px;
+}
+.feature-strip-item:hover {
+  background: rgba(249,115,22,0.06);
+}
+
+/* --- Back to top hover --- */
+#back-to-top {
+  transition: all 0.3s cubic-bezier(.16,1,.3,1);
+}
+#back-to-top:hover {
+  background: var(--orange-dark);
+  transform: translateY(-4px) scale(1.1);
+  box-shadow: 0 8px 24px rgba(249,115,22,0.5);
+}
+
+/* --- Lightbox fade --- */
+#lightbox {
+  animation: fadeIn 0.2s ease;
+}
+#lightbox .lb-content {
+  animation: fadeUp 0.25s ease;
+}
+
+/* --- Mobilon: csökkentett animáció --- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
