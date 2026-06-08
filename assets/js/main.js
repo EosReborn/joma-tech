@@ -174,12 +174,23 @@ function initLightbox() {
 function initCookies() {
   const banner = document.getElementById('cookie-banner');
   if (!banner) return;
-  if (!localStorage.getItem('jt_cookie_consent')) banner.classList.add('show');
+
+  const show = () => {
+    banner.classList.add('show');
+    document.body.classList.add('cookie-visible');
+  };
+  const hide = () => {
+    banner.classList.remove('show');
+    document.body.classList.remove('cookie-visible');
+  };
+
+  if (!localStorage.getItem('jt_cookie_consent')) show();
+
   document.getElementById('cookie-accept')?.addEventListener('click', () => {
-    localStorage.setItem('jt_cookie_consent', 'accepted'); banner.classList.remove('show');
+    localStorage.setItem('jt_cookie_consent', 'accepted'); hide();
   });
   document.getElementById('cookie-reject')?.addEventListener('click', () => {
-    localStorage.setItem('jt_cookie_consent', 'rejected'); banner.classList.remove('show');
+    localStorage.setItem('jt_cookie_consent', 'rejected'); hide();
   });
   document.getElementById('cookie-settings')?.addEventListener('click', () => {
     window.location.href = 'cookie-tajekoztato.html';
