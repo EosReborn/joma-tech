@@ -485,6 +485,136 @@ function initDividerAnim() {
 }
 
 /* ================================================
+   19. LÉZER GÖRGETÉSI VONAL
+   ================================================ */
+function initLaserScrollLine() {
+  const line = document.createElement('div');
+  line.id = 'laser-scroll-line';
+  document.body.appendChild(line);
+
+  let ticking = false;
+  window.addEventListener('scroll', () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      const scrollTop  = window.scrollY;
+      const docHeight  = document.documentElement.scrollHeight - window.innerHeight;
+      const pct        = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      line.style.height = pct + '%';
+      // Fény intenzitása görgetési sebességtől függ
+      const glow = Math.min(pct * 0.5 + 10, 30);
+      line.style.boxShadow = `0 0 ${glow}px var(--orange), 0 0 ${glow * 2}px rgba(237,153,37,0.3)`;
+      ticking = false;
+    });
+  }, { passive: true });
+}
+
+/* ================================================
+   20. INTERAKTÍV ELŐTTE–UTÁNA CSÚSZKA
+   ================================================ */
+function initBASliders() {
+  document.querySelectorAll('.ba-slider-wrap').forEach(wrap => {
+    const before = wrap.querySelector('.ba-slider-before');
+    const handle = wrap.querySelector('.ba-slider-handle');
+    if (!before || !handle) return;
+
+    let dragging = false;
+    let pct = 50;
+
+    const setPos = (x) => {
+      const rect = wrap.getBoundingClientRect();
+      pct = Math.max(2, Math.min(98, ((x - rect.left) / rect.width) * 100));
+      before.style.width = pct + '%';
+      handle.style.left  = pct + '%';
+    };
+
+    // Kezdeti pozíció
+    before.style.width = '50%';
+    handle.style.left  = '50%';
+
+    // Egér
+    handle.addEventListener('mousedown', e => { dragging = true; e.preventDefault(); });
+    wrap.addEventListener('mousedown',   e => { dragging = true; setPos(e.clientX); });
+    window.addEventListener('mouseup',   () => { dragging = false; });
+    window.addEventListener('mousemove', e => { if (dragging) setPos(e.clientX); });
+
+    // Érintés
+    handle.addEventListener('touchstart', e => { dragging = true; e.preventDefault(); }, { passive: false });
+    wrap.addEventListener('touchstart',   e => { dragging = true; setPos(e.touches[0].clientX); }, { passive: true });
+    window.addEventListener('touchend',   () => { dragging = false; });
+    window.addEventListener('touchmove',  e => { if (dragging) setPos(e.touches[0].clientX); }, { passive: true });
+
+    // Automatikus bemutató animáció (egyszer, ha a felhasználó még nem húzta)
+    let userTouched = false;
+    wrap.addEventListener('mousedown', () => { userTouched = true; });
+    wrap.addEventListener('touchstart', () => { userTouched = true; }, { passive: true });
+
+    const obs = new IntersectionObserver(entries => {
+      if (!entries[0].isIntersecting || userTouched) return;
+      // Animáció: 50% → 25% → 75% → 50%
+      const steps = [50, 25, 75, 50];
+      let si = 0;
+      const next = () => {
+        if (userTouched || si >= steps.length) return;
+        const target = steps[si++];
+        const start  = pct;
+        const dur    = 800;
+        const t0     = performance.now();
+        const anim   = (now) => {
+          if (userTouched) return;
+          const p = Math.min((now - t0) / dur, 1);
+          const e = 1 - Math.pow(1 - p, 3);
+          pct = start + (target - start) * e;
+          before.style.width = pct + '%';
+          handle.style.left  = pct + '%';
+          if (p < 1) requestAnimationFrame(anim);
+          else setTimeout(next, 500);
+        };
+        requestAnimationFrame(anim);
+      };
+      setTimeout(next, 600);
+      obs.unobserve(wrap);
+    }, { threshold: 0.5 });
+    obs.observe(wrap);
+  });
+}
+
+/* ================================================
+   21. MUNKAFOLYAMAT IDŐVONAL ANIMÁCIÓ
+   ================================================ */
+function initFolyamatTimeline() {
+  const section = document.querySelector('.folyamat-section');
+  if (!section) return;
+
+  const laser   = section.querySelector('.folyamat-laser');
+  const lepesek = section.querySelectorAll('.folyamat-lepes');
+
+  const obs = new IntersectionObserver(entries => {
+    if (!entries[0].isIntersecting) return;
+
+    // Lézer vonal animálása
+    if (laser) setTimeout(() => laser.classList.add('aktiv'), 200);
+
+    // Lépések egymás után aktívvá válnak
+    lepesek.forEach((lepes, i) => {
+      setTimeout(() => {
+        lepes.classList.add('aktiv');
+        // Szám villanás
+        const szam = lepes.querySelector('.folyamat-szam');
+        if (szam) {
+          szam.style.transform = 'scale(1.2)';
+          setTimeout(() => { szam.style.transform = ''; }, 300);
+        }
+      }, 300 + i * 350);
+    });
+
+    obs.unobserve(section);
+  }, { threshold: 0.3 });
+
+  obs.observe(section);
+}
+
+/* ================================================
    INIT
    ================================================ */
 document.addEventListener('DOMContentLoaded', () => {
@@ -503,4 +633,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initHeroEntrance();
   initCardBorderAnim();
   initDividerAnim();
+  initLaserScrollLine();
+  initBASliders();
+  initFolyamatTimeline();
 });
