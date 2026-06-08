@@ -1,0 +1,11 @@
+# JoMa-Tech Laser Clean - robots.txt
+User-agent: *
+Allow: /
+
+# Jogi oldalak indexelésének tiltása
+Disallow: /impresszum.html
+Disallow: /adatkezeles.html
+Disallow: /cookie-tajekoztato.html
+
+# Sitemap helye
+Sitemap: https://joma-tech-laserclean.hu/sitemap.xml
