@@ -189,17 +189,10 @@ h1,h2,h3,h4,h5,h6 {
   justify-content: center;
   flex-shrink: 0;
 }
-.nav-logo-img {
-  height: 44px;
-  width: auto;
-  display: block;
-  object-fit: contain;
+.nav-logo-text {
+  line-height: 1.1;
 }
-@media (max-width: 480px) {
-  .nav-logo-img { height: 36px; }
-}
-
-
+.nav-logo-text strong {
   display: block;
   font-family: var(--font-display);
   font-size: 1.18rem;
