@@ -280,7 +280,7 @@ function initLaserCanvas() {
 function initTypewriter() {
   const el = document.getElementById('typewriter-text');
   if (!el) return;
-  const texts = ['rozsda eltávolítás', 'festék eltávolítás', 'fémtisztítás', 'precíz megoldás'];
+  const texts = ['rozsdaeltávolítás', 'festékeltávolítás', 'fémtisztítás', 'lézeres megoldás'];
   let ti = 0, ci = 0, deleting = false;
   const type = () => {
     const current = texts[ti];
