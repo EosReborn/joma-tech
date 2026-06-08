@@ -212,7 +212,7 @@ function initLaserCanvas() {
       this.life   = Math.random() * 200 + 100;
       this.maxLife= this.life;
       this.size   = Math.random() * 1.8 + 0.4;
-      this.color  = Math.random() > 0.6 ? '#f97316' : '#fff';
+      this.color  = Math.random() > 0.6 ? '#ED9925' : '#fff';
     }
     update() {
       this.x += this.vx; this.y += this.vy; this.life--;
@@ -222,7 +222,7 @@ function initLaserCanvas() {
       const alpha = (this.life / this.maxLife) * 0.55;
       ctx.save();
       ctx.globalAlpha = alpha;
-      ctx.shadowBlur  = this.color === '#f97316' ? 10 : 4;
+      ctx.shadowBlur  = this.color === '#ED9925' ? 10 : 4;
       ctx.shadowColor = this.color;
       ctx.fillStyle   = this.color;
       ctx.beginPath();
@@ -251,10 +251,10 @@ function initLaserCanvas() {
       const alpha = (this.life / this.maxLife) * 0.18;
       ctx.save();
       ctx.globalAlpha = alpha;
-      ctx.strokeStyle = '#f97316';
+      ctx.strokeStyle = '#ED9925';
       ctx.lineWidth   = this.width;
       ctx.shadowBlur  = 8;
-      ctx.shadowColor = '#f97316';
+      ctx.shadowColor = '#ED9925';
       ctx.beginPath();
       ctx.moveTo(this.x1, this.y1);
       ctx.lineTo(this.x2, this.y2);
@@ -343,11 +343,11 @@ function initCursorTrail() {
         width:${Math.random()*4+2}px;
         height:${Math.random()*4+2}px;
         border-radius:50%;
-        background:${Math.random()>.5?'#f97316':'#fff'};
+        background:${Math.random()>.5?'#ED9925':'#fff'};
         pointer-events:none;
         z-index:9999;
         transform:translate(-50%,-50%);
-        box-shadow:0 0 6px #f97316;
+        box-shadow:0 0 6px #ED9925;
       `;
       document.body.appendChild(dot);
       sparks.push(dot);
