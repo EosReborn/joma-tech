@@ -1639,12 +1639,21 @@ h1,h2,h3,h4,h5,h6 {
 
 /* --- Back to top hover --- */
 #back-to-top {
-  transition: all 0.3s cubic-bezier(.16,1,.3,1);
+  transition: all 0.3s cubic-bezier(.16,1,.3,1), bottom 0.3s ease;
 }
 #back-to-top:hover {
   background: var(--orange-dark);
   transform: translateY(-4px) scale(1.1);
   box-shadow: 0 8px 24px rgba(237,153,37,0.5);
+}
+/* Ha a sütiértesítő látható, a nyíl feljebb kerül */
+body.cookie-visible #back-to-top {
+  bottom: 100px;
+}
+@media (max-width: 480px) {
+  body.cookie-visible #back-to-top {
+    bottom: 120px;
+  }
 }
 
 /* --- Lightbox fade --- */
