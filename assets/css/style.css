@@ -180,6 +180,40 @@ h1,h2,h3,h4,h5,h6 {
   gap: 12px;
   text-decoration: none;
 }
+.nav-logo-img {
+  height: 46px;
+  width: auto;
+  display: block;
+  object-fit: contain;
+  filter: drop-shadow(0 0 6px rgba(237,153,37,0.25));
+  transition: filter 0.3s ease, transform 0.3s ease;
+}
+.nav-logo:hover .nav-logo-img {
+  filter: drop-shadow(0 0 14px rgba(237,153,37,0.6));
+  transform: scale(1.04);
+}
+@media (max-width: 480px) {
+  .nav-logo-img { height: 38px; }
+}
+.nav-logo-text {
+  line-height: 1.15;
+}
+.nav-logo-text strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.18rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.04em;
+}
+.nav-logo-text span {
+  font-family: var(--font-cond);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--orange);
+}
 .nav-logo-icon {
   width: 40px; height: 40px;
   background: var(--orange);
