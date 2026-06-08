@@ -510,71 +510,93 @@ function initLaserScrollLine() {
 }
 
 /* ================================================
-   20. INTERAKTÍV ELŐTTE–UTÁNA CSÚSZKA
+   20. INTERAKTÍV ELŐTTE–UTÁNA CSÚSZKA — újraírva
    ================================================ */
 function initBASliders() {
   document.querySelectorAll('.ba-slider-wrap').forEach(wrap => {
     const before = wrap.querySelector('.ba-slider-before');
-    const handle = wrap.querySelector('.ba-slider-handle');
-    if (!before || !handle) return;
+    const line   = wrap.querySelector('.ba-slider-line');
+    const btn    = wrap.querySelector('.ba-slider-btn');
+    if (!before) return;
 
-    let dragging = false;
-    let pct = 50;
+    let dragging    = false;
+    let pct         = 50;
+    let userTouched = false;
 
-    const setPos = (x) => {
+    const setPos = (clientX) => {
       const rect = wrap.getBoundingClientRect();
-      pct = Math.max(2, Math.min(98, ((x - rect.left) / rect.width) * 100));
+      pct = Math.max(2, Math.min(98, ((clientX - rect.left) / rect.width) * 100));
       before.style.width = pct + '%';
-      handle.style.left  = pct + '%';
+      if (line) line.style.left = pct + '%';
+      if (btn)  btn.style.left  = pct + '%';
     };
 
     // Kezdeti pozíció
-    before.style.width = '50%';
-    handle.style.left  = '50%';
+    setPos(wrap.getBoundingClientRect().left + wrap.offsetWidth * 0.5);
 
-    // Egér
-    handle.addEventListener('mousedown', e => { dragging = true; e.preventDefault(); });
-    wrap.addEventListener('mousedown',   e => { dragging = true; setPos(e.clientX); });
-    window.addEventListener('mouseup',   () => { dragging = false; });
-    window.addEventListener('mousemove', e => { if (dragging) setPos(e.clientX); });
+    // --- Egér ---
+    wrap.addEventListener('mousedown', e => {
+      dragging = true;
+      userTouched = true;
+      wrap.classList.add('dragging');
+      setPos(e.clientX);
+      e.preventDefault();
+    });
+    window.addEventListener('mousemove', e => {
+      if (dragging) setPos(e.clientX);
+    });
+    window.addEventListener('mouseup', () => {
+      dragging = false;
+      wrap.classList.remove('dragging');
+    });
 
-    // Érintés
-    handle.addEventListener('touchstart', e => { dragging = true; e.preventDefault(); }, { passive: false });
-    wrap.addEventListener('touchstart',   e => { dragging = true; setPos(e.touches[0].clientX); }, { passive: true });
-    window.addEventListener('touchend',   () => { dragging = false; });
-    window.addEventListener('touchmove',  e => { if (dragging) setPos(e.touches[0].clientX); }, { passive: true });
+    // --- Érintés ---
+    wrap.addEventListener('touchstart', e => {
+      dragging = true;
+      userTouched = true;
+      wrap.classList.add('dragging');
+      setPos(e.touches[0].clientX);
+    }, { passive: true });
+    window.addEventListener('touchmove', e => {
+      if (!dragging) return;
+      setPos(e.touches[0].clientX);
+    }, { passive: true });
+    window.addEventListener('touchend', () => {
+      dragging = false;
+      wrap.classList.remove('dragging');
+    });
 
-    // Automatikus bemutató animáció (egyszer, ha a felhasználó még nem húzta)
-    let userTouched = false;
-    wrap.addEventListener('mousedown', () => { userTouched = true; });
-    wrap.addEventListener('touchstart', () => { userTouched = true; }, { passive: true });
-
+    // --- Bemutató animáció (ha még nem húzta a user) ---
     const obs = new IntersectionObserver(entries => {
       if (!entries[0].isIntersecting || userTouched) return;
-      // Animáció: 50% → 25% → 75% → 50%
-      const steps = [50, 25, 75, 50];
+      let animPct = 50;
+      const steps = [25, 75, 50];
       let si = 0;
-      const next = () => {
-        if (userTouched || si >= steps.length) return;
-        const target = steps[si++];
-        const start  = pct;
-        const dur    = 800;
-        const t0     = performance.now();
-        const anim   = (now) => {
+
+      const animTo = (target, dur, onDone) => {
+        const start = animPct;
+        const t0    = performance.now();
+        const tick  = (now) => {
           if (userTouched) return;
-          const p = Math.min((now - t0) / dur, 1);
-          const e = 1 - Math.pow(1 - p, 3);
-          pct = start + (target - start) * e;
-          before.style.width = pct + '%';
-          handle.style.left  = pct + '%';
-          if (p < 1) requestAnimationFrame(anim);
-          else setTimeout(next, 500);
+          const p  = Math.min((now - t0) / dur, 1);
+          const ep = 1 - Math.pow(1 - p, 3);
+          animPct  = start + (target - start) * ep;
+          before.style.width = animPct + '%';
+          if (line) line.style.left = animPct + '%';
+          if (btn)  btn.style.left  = animPct + '%';
+          if (p < 1) requestAnimationFrame(tick);
+          else if (onDone) onDone();
         };
-        requestAnimationFrame(anim);
+        requestAnimationFrame(tick);
       };
-      setTimeout(next, 600);
+
+      const nextStep = () => {
+        if (userTouched || si >= steps.length) return;
+        animTo(steps[si++], 900, () => setTimeout(nextStep, 600));
+      };
+      setTimeout(nextStep, 700);
       obs.unobserve(wrap);
-    }, { threshold: 0.5 });
+    }, { threshold: 0.6 });
     obs.observe(wrap);
   });
 }
